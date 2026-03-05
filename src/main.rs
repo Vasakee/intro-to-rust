@@ -61,32 +61,58 @@ fn parse_operation(input: &str) -> Result<Operation, CalcError> {
     }
 }
 
-// NEW: validates operands based on which operation will be performed
+// EXERCISE 1: INPUT VALIDATION - Validates operands based on operation type
+// Rejects negative numbers for operations that don't support them
 fn validate_operands(op: &Operation, a: f64, b: f64) -> Result<(), CalcError> {
     match op {
-        // Modulo is undefined for negative operands in this calculator's context
+        // Modulo is undefined for negative operands - both must be non-negative
         Operation::Modulo => {
             if a < 0.0 {
                 return Err(CalcError::NegativeOperand(
-                    "modulo requires a non-negative dividend (a >= 0)".to_string()
+                    "Modulo operation: dividend (first number) must be non-negative (a >= 0)".to_string()
                 ));
             }
             if b < 0.0 {
                 return Err(CalcError::NegativeOperand(
-                    "modulo requires a non-negative divisor (b >= 0)".to_string()
+                    "Modulo operation: divisor (second number) must be non-negative (b >= 0)".to_string()
                 ));
             }
         }
-        // Negative base with a fractional exponent produces NaN (e.g. (-2)^0.5)
-        // Negative exponent is allowed (produces fractions), but negative base is not
+        // Power operation: negative base with fractional exponent is undefined
         Operation::Power => {
             if a < 0.0 {
                 return Err(CalcError::NegativeOperand(
-                    "power requires a non-negative base (a >= 0); negative bases with fractional exponents are undefined".to_string()
+                    "Power operation: base (first number) must be non-negative (a >= 0). \
+                    Negative bases with fractional exponents produce undefined results (NaN)".to_string()
                 ));
             }
         }
-        // Add, Subtract, Multiply, Divide accept all real numbers
+        // Add, Subtract, Multiply, Divide accept all real numbers (including negative)
+        _ => {}
+    }
+    Ok(())
+}
+
+// EXERCISE 1: Additional validation function for user input
+// Checks if a number is valid for the chosen operation
+fn validate_input_for_operation(op: &Operation, operand_num: u32, value: f64) -> Result<(), CalcError> {
+    let operand_name = if operand_num == 1 { "First number" } else { "Second number" };
+    
+    match op {
+        Operation::Modulo => {
+            if value < 0.0 {
+                return Err(CalcError::NegativeOperand(
+                    format!("{} in modulo operation must be non-negative (>= 0)", operand_name)
+                ));
+            }
+        }
+        Operation::Power => {
+            if operand_num == 1 && value < 0.0 {
+                return Err(CalcError::NegativeOperand(
+                    format!("{} (base) in power operation must be non-negative (>= 0)", operand_name)
+                ));
+            }
+        }
         _ => {}
     }
     Ok(())
@@ -104,7 +130,7 @@ fn execute(op: &Operation, a: f64, b: f64) -> Result<f64, CalcError> {
                 Ok(a / b)
             }
         }
-        Operation::Modulo => {  // FIX: now has its own real implementation
+        Operation::Modulo => {  
             if b == 0.0 {
                 Err(CalcError::DivisionByZero)
             } else {
@@ -182,21 +208,33 @@ fn main() {
                     Err(_) => { println!("Error: invalid number"); continue; }
                 };
 
+                // EXERCISE 1: Validate first input for this operation
+                if let Err(e) = validate_input_for_operation(&op, 1, a) {
+                    println!("  ❌ {}", e);
+                    continue;
+                }
+
                 let b_str = read_input("  Second number: ");
                 let b: f64 = match b_str.parse() {
                     Ok(v) => v,
                     Err(_) => { println!("Error: invalid number"); continue; }
                 };
 
+                // EXERCISE 1: Validate second input for this operation
+                if let Err(e) = validate_input_for_operation(&op, 2, b) {
+                    println!("  ❌ {}", e);
+                    continue;
+                }
+
                 // NEW: validate before executing
                 if let Err(e) = validate_operands(&op, a, b) {
-                    println!("  Error: {}", e);
+                    println!("  ❌ Error: {}", e);
                     continue;
                 }
 
                 match execute(&op, a, b) {
                     Ok(result) => {
-                        println!("  Result: {}", result);
+                        println!("  ✓ Result: {}", result);
                         history.entries.push(Calculation {
                             operation: format!("{:?}", op),
                             operand_a: a,
@@ -204,7 +242,7 @@ fn main() {
                             result,
                         });
                     }
-                    Err(e) => println!("  Error: {}", e),
+                    Err(e) => println!("  ❌ Error: {}", e),
                 }
             }
         }
