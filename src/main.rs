@@ -1,6 +1,8 @@
 use borsh::{BorshSerialize, BorshDeserialize};
 use std::io::{self, Write};
 
+mod wallet;  // Exercise 2: Wallet struct
+
 // ---- STRUCTS (Section 6) ----
 #[derive(BorshSerialize, BorshDeserialize, Debug, Clone)]
 struct Calculation {
@@ -160,6 +162,26 @@ fn deserialize_history(data: &[u8]) -> Result<CalculationHistory, CalcError> {
 }
 
 fn main() {
+    println!("=== Solana CLI Tool - Exercises ===\n");
+    println!("Choose an exercise:");
+    println!("  1. Calculator with Input Validation (Exercise 1)");
+    println!("  2. Wallet Struct with Transactions (Exercise 2)");
+    println!("  3. Instruction Parser (Exercise 3)\n");
+
+    print!("> Enter exercise number (1-3): ");
+    io::stdout().flush().unwrap();
+    
+    let mut choice = String::new();
+    io::stdin().read_line(&mut choice).unwrap();
+    
+    match choice.trim() {
+        "1" => run_calculator(),
+        "2" => wallet::run_exercise_2(),
+        _ => println!("Invalid choice"),
+    }
+}
+
+fn run_calculator() {
     println!("=== Solana CLI Calculator & Serializer ===");
     println!("Commands: add/sub/mul/div/mod/pow, 'history', 'serialize', 'quit'\n");
 
