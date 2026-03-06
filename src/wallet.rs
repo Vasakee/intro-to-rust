@@ -119,39 +119,39 @@ pub fn run_exercise_2() {
         1000,  // Initial balance: 1000 lamports
     );
 
-    println!("📍 Created wallet: {}", wallet.address);
-    println!("💰 Initial balance: {} lamports\n", wallet.get_balance());
+    println!(" Created wallet: {}", wallet.address);
+    println!(" Initial balance: {} lamports\n", wallet.get_balance());
 
     // Perform deposits
     println!("--- Performing Transactions ---");
     if let Err(e) = wallet.deposit(500) {
-        println!("❌ Deposit failed: {}", e);
+        println!("Deposit failed: {}", e);
     }
 
     if let Err(e) = wallet.deposit(250) {
-        println!("❌ Deposit failed: {}", e);
+        println!("Deposit failed: {}", e);
     }
 
     // Perform a withdrawal
     if let Err(e) = wallet.withdraw(300) {
-        println!("❌ Withdrawal failed: {}", e);
+        println!("Withdrawal failed: {}", e);
     }
 
     // Try to withdraw more than we have (should fail)
     println!("\n--- Attempting to withdraw more than available ---");
     match wallet.withdraw(2000) {
         Ok(_) => println!("Withdrawal succeeded"),
-        Err(e) => println!("❌ {}", e),
+        Err(e) => println!("{}", e),
     }
 
     // Display final state
     println!("\n--- Final Wallet State ---");
-    println!("💰 Final balance: {} lamports", wallet.get_balance());
-    println!("📊 Total transactions: {}", wallet.get_transactions().len());
+    println!("Final balance: {} lamports", wallet.get_balance());
+    println!("Total transactions: {}", wallet.get_transactions().len());
     for (i, tx) in wallet.get_transactions().iter().enumerate() {
         let direction = match tx.direction {
-            TransactionDirection::In => "📥 IN ",
-            TransactionDirection::Out => "📤 OUT",
+            TransactionDirection::In => "IN ",
+            TransactionDirection::Out => "OUT",
         };
         println!("  [{}] {} {} lamports (timestamp: {})", i + 1, direction, tx.amount, tx.timestamp);
     }
@@ -179,10 +179,10 @@ pub fn run_exercise_2() {
                         println!("✓ Serialization round-trip successful - data intact!");
                     }
                 }
-                Err(e) => println!("❌ Deserialization failed: {}", e),
+                Err(e) => println!("Deserialization failed: {}", e),
             }
         }
-        Err(e) => println!("❌ Serialization failed: {}", e),
+        Err(e) => println!("Serialization failed: {}", e),
     }
 
     println!("\n===== Exercise 2 Complete =====\n");

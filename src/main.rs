@@ -2,6 +2,7 @@ use borsh::{BorshSerialize, BorshDeserialize};
 use std::io::{self, Write};
 
 mod wallet;  // Exercise 2: Wallet struct
+mod instruction_parser;  // Exercise 3: Instruction parser
 
 // ---- STRUCTS (Section 6) ----
 #[derive(BorshSerialize, BorshDeserialize, Debug, Clone)]
@@ -33,7 +34,7 @@ enum Operation {
 enum CalcError {
     DivisionByZero,
     InvalidOperation(String),
-    ParseError(String),
+    // ParseError(String),  // REMOVED: never used
     SerializationError(String),
     NegativeOperand(String),  // NEW: for input validation
 }
@@ -43,7 +44,7 @@ impl std::fmt::Display for CalcError {
         match self {
             CalcError::DivisionByZero => write!(f, "Cannot divide by zero"),
             CalcError::InvalidOperation(op) => write!(f, "Unknown operation: {}", op),
-            CalcError::ParseError(msg) => write!(f, "Parse error: {}", msg),
+            // CalcError::ParseError(msg) => write!(f, "Parse error: {}", msg),  // REMOVED
             CalcError::SerializationError(msg) => write!(f, "Serialization error: {}", msg),
             CalcError::NegativeOperand(msg) => write!(f, "Invalid input: {}", msg),
         }
@@ -177,6 +178,7 @@ fn main() {
     match choice.trim() {
         "1" => run_calculator(),
         "2" => wallet::run_exercise_2(),
+        "3" => instruction_parser::run_exercise_3(),
         _ => println!("Invalid choice"),
     }
 }
